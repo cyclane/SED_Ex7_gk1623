@@ -580,14 +580,7 @@ public class JPhotoFrame extends JFrame
             showExif();
         }
         else if (cmd.equals(JPhotoMenu.A_SLIDESHOW)) {
-            if (photos.getSize()>0) {
-                JPhotoShow show = new JPhotoShow(photos, 5000, list);
-                show.setVisible(true);
-            }
-            else
-                JOptionPane.showMessageDialog(this, "No photos to show!",
-                                              APP_NAME, JOptionPane.ERROR_MESSAGE);
-                
+            actionSlideshow();
         }
         else if (cmd.equals(JPhotoMenu.A_HELP)) {
             displayHelp();
@@ -624,6 +617,16 @@ public class JPhotoFrame extends JFrame
             System.out.println("Not implemented: "+cmd);
         
         setTitle();
+    }
+
+    protected void actionSlideshow() {
+        if (photos.getSize()>0) {
+            JPhotoShow show = new JPhotoShow(photos, 5000, list);
+            show.setVisible(true);
+        }
+        else
+            JOptionPane.showMessageDialog(this, "No photos to show!",
+                                          APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
     public void insertPhotos(String files[]) {
