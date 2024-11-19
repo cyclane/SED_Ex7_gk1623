@@ -607,7 +607,10 @@ public class JPhotoFrame extends JFrame
             showExif();
         }
         else if (cmd.equals(JPhotoMenu.A_SLIDESHOW)) {
-            actionSlideshow();
+            actionSlideshow(5000);
+        }
+        else if (cmd.equals(JPhotoMenu.A_PREVIEW_SLIDESHOW)) {
+            actionSlideshow(750);
         }
         else if (cmd.equals(JPhotoMenu.A_HELP)) {
             displayHelp();
@@ -646,9 +649,9 @@ public class JPhotoFrame extends JFrame
         setTitle();
     }
 
-    protected void actionSlideshow() {
+    private void actionSlideshow(int interval) {
         if (photos.getSize()>0) {
-            photoShowFactory.create(photos, 5000, list);
+            photoShowFactory.create(photos, interval, list);
         }
         else
             dialogService.showMessageDialog(this, NO_PHOTOS_TO_SHOW,
