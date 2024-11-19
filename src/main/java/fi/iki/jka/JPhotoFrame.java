@@ -114,13 +114,18 @@ public class JPhotoFrame extends JFrame
             JOptionPane.showMessageDialog(parent, message, title, messageType);
         }
     };
+    private JPhotoShowFactory photoShowFactory = (photos, interval, list) -> {
+        JPhotoShow photoShow = new JPhotoShow(photos, interval, list);
+        photoShow.setVisible(true);
+        return photoShow;
+    };
     
     protected JPhotoFrame() throws Exception {
         // Do nothing... needed for inheritance !
     }
 
     public JPhotoFrame(String frameName, JPhotoCollection photos) throws Exception {
-        this(frameName, photos, null);
+        this(frameName, photos, null, null);
         display(frameName);
     }
 
@@ -129,9 +134,12 @@ public class JPhotoFrame extends JFrame
     }
 
     // For testing
-    protected JPhotoFrame(String frameName, JPhotoCollection photos, DialogService dialogService) throws Exception {
+    protected JPhotoFrame(String frameName, JPhotoCollection photos, DialogService dialogService, JPhotoShowFactory photoShowFactory) throws Exception {
         if (dialogService != null) {
             this.dialogService = dialogService;
+        }
+        if (photoShowFactory != null) {
+            this.photoShowFactory = photoShowFactory;
         }
         init(frameName, photos);
     }
@@ -640,8 +648,7 @@ public class JPhotoFrame extends JFrame
 
     protected void actionSlideshow() {
         if (photos.getSize()>0) {
-            JPhotoShow show = new JPhotoShow(photos, 5000, list);
-            show.setVisible(true);
+            photoShowFactory.create(photos, 5000, list);
         }
         else
             dialogService.showMessageDialog(this, NO_PHOTOS_TO_SHOW,
@@ -935,8 +942,7 @@ public class JPhotoFrame extends JFrame
                 }
             }
             else {
-                JPhotoShow show = new JPhotoShow(photos, 0, list);
-                show.setVisible(true);
+                photoShowFactory.create(photos, 0, list);
             }
         }
         else
