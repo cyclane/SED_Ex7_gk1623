@@ -81,6 +81,8 @@ public class JPhotoFrame extends JFrame
     public static String PAGEINFO = "pageinfo";
     public static String PHOTO_DIR = "photo_directory";
 
+    public static final String NO_PHOTOS_TO_SHOW = "No photos to show!";
+
     protected Preferences prefs = null;
     protected String albumFileName = null;
     protected JPhotoList list = null;
@@ -118,11 +120,20 @@ public class JPhotoFrame extends JFrame
     }
 
     public JPhotoFrame(String frameName, JPhotoCollection photos) throws Exception {
-        init(frameName, photos);
+        this(frameName, photos, null);
+        display(frameName);
     }
 
     public JPhotoFrame(String frameName, String files[]) throws Exception {
-        init(frameName, new JPhotoCollection(files));
+        this(frameName, new JPhotoCollection(files));
+    }
+
+    // For testing
+    protected JPhotoFrame(String frameName, JPhotoCollection photos, DialogService dialogService) throws Exception {
+        if (dialogService != null) {
+            this.dialogService = dialogService;
+        }
+        init(frameName, photos);
     }
 
     /** Real init called from different constructors
@@ -211,6 +222,11 @@ public class JPhotoFrame extends JFrame
         im.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "moveSelectionDn");
         am.put("moveSelectionDn", new MoveSelection(1));
 
+        statusLine.setText("Drag and drop photos or use File/Import operations to add photos."
+                +" Original photos are never modified.");
+    }
+
+    private void display(String frameName) {
         pack(); // for some reason this must be called before setSize()!?
         
         setLocation(prefs.getInt(FRAME_X,50)+20*allFrames.size(),
@@ -227,7 +243,7 @@ public class JPhotoFrame extends JFrame
                 "Create New, Import Images",
                 "Create New Album"};
     
-        if (frameName==null && photo==null) {
+        if (frameName==null && editingPhoto==null) {
             int n = JOptionPane.showOptionDialog(frame,
             "How would you like to start?",
             "How to start...",
@@ -246,17 +262,7 @@ public class JPhotoFrame extends JFrame
                 ActionEvent event = new ActionEvent(this, 0, JPhotoMenu.A_OPEN);
                 actionPerformed(event);
             }   
-        }        
-        
-        statusLine.setText("Drag and drop photos or use File/Import operations to add photos."
-                +" Original photos are never modified.");
-        
-        /*
-        JPhotoTransform transform = new JPhotoTransform();
-        fullViewPanel.setTransform(transform);
-        transform.setParentAndPanel(this, fullViewPanel);
-        transform.startEditing();
-        */
+        }
     }
 
     /** ActionListener
@@ -638,7 +644,7 @@ public class JPhotoFrame extends JFrame
             show.setVisible(true);
         }
         else
-            dialogService.showMessageDialog(this, "No photos to show!",
+            dialogService.showMessageDialog(this, NO_PHOTOS_TO_SHOW,
                                           APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
