@@ -8,6 +8,7 @@ package fi.iki.jka;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Graphics2D;
@@ -99,6 +100,18 @@ public class JPhotoFrame extends JFrame
     protected File photoDirectory = null;
     
     protected static HashMap allFrames = new HashMap();
+
+    private DialogService dialogService = new DialogService() {
+        @Override
+        public void showMessageDialog(Component parent, String message) {
+            JOptionPane.showMessageDialog(parent, message);
+        }
+
+        @Override
+        public void showMessageDialog(Component parent, String message, String title, int messageType) {
+            JOptionPane.showMessageDialog(parent, message, title, messageType);
+        }
+    };
     
     protected JPhotoFrame() throws Exception {
         // Do nothing... needed for inheritance !
@@ -126,7 +139,7 @@ public class JPhotoFrame extends JFrame
         if (frameName!=null) {
             albumFileName = frameName;
             if (!photos.load(albumFileName))
-                JOptionPane.showMessageDialog(null, "Cannot open "+albumFileName,
+                dialogService.showMessageDialog(null, "Cannot open "+albumFileName,
                                               APP_NAME, JOptionPane.ERROR_MESSAGE);
         }
         
@@ -270,10 +283,10 @@ public class JPhotoFrame extends JFrame
                                 setFrameIcon();
                             }
                             else
-                                JOptionPane.showMessageDialog(this, file+" is not a valid JPhoto file.");
+                                dialogService.showMessageDialog(this, file+" is not a valid JPhoto file.");
                         } catch (Exception e) {
                             System.out.println("load error:"+e);
-                            JOptionPane.showMessageDialog(this, "Cannot open "+file,
+                            dialogService.showMessageDialog(this, "Cannot open "+file,
                                                           APP_NAME, JOptionPane.ERROR_MESSAGE);
                         }
                     }
@@ -294,7 +307,7 @@ public class JPhotoFrame extends JFrame
                         setTitle();
                     }
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Cannot save as "+file,
+                    dialogService.showMessageDialog(this, "Cannot save as "+file,
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -309,7 +322,7 @@ public class JPhotoFrame extends JFrame
                     String input[] = { dir+File.separator };
                     files = Utils.expandAllDirectories(input);
                     if (files==null || files.length==0)
-                        JOptionPane.showMessageDialog(this, "No photos in "+dir,
+                        dialogService.showMessageDialog(this, "No photos in "+dir,
                                                       APP_NAME, JOptionPane.ERROR_MESSAGE);
                     photoDirectory = new File(dir);
                 }
@@ -341,7 +354,7 @@ public class JPhotoFrame extends JFrame
                 String input[] = { dir+File.separator };
                 files = Utils.expandAllDirectories(input);
                 if (files==null || files.length==0)
-                    JOptionPane.showMessageDialog(this, "No photos in "+dir,
+                    dialogService.showMessageDialog(this, "No photos in "+dir,
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
                 else
                     photoDirectory = new File(dir);
@@ -354,7 +367,7 @@ public class JPhotoFrame extends JFrame
         else if (cmd.startsWith("as ")) {
 
             if (JPhotoStatus.inProgress()) {
-                JOptionPane.showMessageDialog(this, "Already exporting, please wait.",
+                dialogService.showMessageDialog(this, "Already exporting, please wait.",
                                               APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
             else {
@@ -372,10 +385,10 @@ public class JPhotoFrame extends JFrame
                         //    status = photos.exportHtmlTarja(albumFileName);
 
                         if (status==false)
-                            JOptionPane.showMessageDialog(this, "Export of "+albumFileName+ " failed.",
+                            dialogService.showMessageDialog(this, "Export of "+albumFileName+ " failed.",
                                                           APP_NAME, JOptionPane.ERROR_MESSAGE);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(this, "Cannot save "+albumFileName,
+                        dialogService.showMessageDialog(this, "Cannot save "+albumFileName,
                                                       APP_NAME, JOptionPane.ERROR_MESSAGE);
                     }                
                 }
@@ -397,7 +410,7 @@ public class JPhotoFrame extends JFrame
                     status = photos.exportTemplateTarja(target);
                 */
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Export to "+target+ " failed.",
+                    dialogService.showMessageDialog(this, "Export to "+target+ " failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
                 else
                     statusLine.setText("Exported template(s) to "+target);
@@ -407,7 +420,7 @@ public class JPhotoFrame extends JFrame
             if (askNameAndSave()) {
                 boolean status = photos.exportSubtitledPhotos(albumFileName);
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Export subtitled to "+albumFileName+ " failed.",
+                    dialogService.showMessageDialog(this, "Export subtitled to "+albumFileName+ " failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -415,7 +428,7 @@ public class JPhotoFrame extends JFrame
             if (askNameAndSave()) {
                 boolean status = photos.copyOriginals(albumFileName, "originals", true);
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Copy originals to "+albumFileName+ " failed.",
+                    dialogService.showMessageDialog(this, "Copy originals to "+albumFileName+ " failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -423,10 +436,10 @@ public class JPhotoFrame extends JFrame
             if (askNameAndSave()) {
                 boolean status = photos.exportHtmlJari3(albumFileName);
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Export index failed.",
+                    dialogService.showMessageDialog(this, "Export index failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
                 else
-                    JOptionPane.showMessageDialog(this, "Exported index of all linked albums.",
+                    dialogService.showMessageDialog(this, "Exported index of all linked albums.",
                                                   APP_NAME, JOptionPane.INFORMATION_MESSAGE);
             }
         }
@@ -435,12 +448,12 @@ public class JPhotoFrame extends JFrame
             if (askNameAndSave()) {
                 String targetFile = askFileName(".jar", FileDialog.SAVE);
                 if (targetFile==null) {
-                    JOptionPane.showMessageDialog(this, "File not set");
+                    dialogService.showMessageDialog(this, "File not set");
                     return;
                 }
                 boolean status = photos.exportSlideshow(targetFile, 1);
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Export of slideshow to "+albumFileName+ " failed.",
+                    dialogService.showMessageDialog(this, "Export of slideshow to "+albumFileName+ " failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
         }
@@ -449,12 +462,12 @@ public class JPhotoFrame extends JFrame
             if (askNameAndSave()) {
                 String targetFile = askFileName(".jar", FileDialog.SAVE);
                 if (targetFile==null) {
-                    JOptionPane.showMessageDialog(this, "File not set");
+                    dialogService.showMessageDialog(this, "File not set");
                     return;
                 }
                 boolean status = photos.exportSlideshow(targetFile, 2);
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Export of slideshow to "+albumFileName+ " failed.",
+                    dialogService.showMessageDialog(this, "Export of slideshow to "+albumFileName+ " failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
         }        
@@ -463,12 +476,12 @@ public class JPhotoFrame extends JFrame
             if (askNameAndSave()) {
                 String targetFile = askFileName(".jar", FileDialog.SAVE);
                 if (targetFile==null) {
-                    JOptionPane.showMessageDialog(this, "File not set");
+                    dialogService.showMessageDialog(this, "File not set");
                     return;
                 }
                 boolean status = photos.exportSlideshow(targetFile, 3);
                 if (status==false)
-                    JOptionPane.showMessageDialog(this, "Export of slideshow to "+albumFileName+ " failed.",
+                    dialogService.showMessageDialog(this, "Export of slideshow to "+albumFileName+ " failed.",
                                                   APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
         }        
@@ -563,13 +576,13 @@ public class JPhotoFrame extends JFrame
                 setFrameIcon();
             }
             else {
-                JOptionPane.showMessageDialog(this, "Cover photo must be a real image.",
+                dialogService.showMessageDialog(this, "Cover photo must be a real image.",
                                               APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
         }
         else if (cmd.equals(JPhotoMenu.A_SAVE_DEFAULTS)) {
             prefs.put(PAGEINFO, photos.getPageInfo().marshal());
-            JOptionPane.showMessageDialog(this, "Saved current page attributes as defaults.",
+            dialogService.showMessageDialog(this, "Saved current page attributes as defaults.",
                                           APP_NAME, JOptionPane.INFORMATION_MESSAGE);
         }
         else if (cmd.equals(JPhotoMenu.A_FULLVIEW)) {
@@ -586,7 +599,7 @@ public class JPhotoFrame extends JFrame
             displayHelp();
         }
         else if (cmd.equals(JPhotoMenu.A_ABOUT)) {
-            JOptionPane.showMessageDialog(this, APP_NAME+" v1.4.5 - Organize and Publish Your Digital Photos.\n"+
+            dialogService.showMessageDialog(this, APP_NAME+" v1.4.5 - Organize and Publish Your Digital Photos.\n"+
                                           "Copyright 2005-2007 Jari Karjala [www.jpkware.com],\n"
                                           +"Tarja Hakala [www.hakalat.net]"
                                           +" and Zbynek Muzik [zbynek.muzik@email.cz]\n"
@@ -625,7 +638,7 @@ public class JPhotoFrame extends JFrame
             show.setVisible(true);
         }
         else
-            JOptionPane.showMessageDialog(this, "No photos to show!",
+            dialogService.showMessageDialog(this, "No photos to show!",
                                           APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
 
@@ -778,10 +791,10 @@ public class JPhotoFrame extends JFrame
                     setTitle();
                     return true;
                 }
-                JOptionPane.showMessageDialog(this, "Saving "+albumFileName+" failed",
+                dialogService.showMessageDialog(this, "Saving "+albumFileName+" failed",
                                               APP_NAME, JOptionPane.ERROR_MESSAGE);
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Save exception "
+                dialogService.showMessageDialog(this, "Save exception "
                                               +albumFileName+":"+e.getMessage(),
                                               APP_NAME, JOptionPane.ERROR_MESSAGE);
             }
@@ -910,7 +923,7 @@ public class JPhotoFrame extends JFrame
                         newFrame = new JPhotoFrame(newFile, new JPhotoCollection(newFile));
                         newFrame.setVisible(true);
                     } catch (Exception e) {
-                        JOptionPane.showMessageDialog(null, "Cannot open "+newFile,
+                        dialogService.showMessageDialog(null, "Cannot open "+newFile,
                                                       APP_NAME, JOptionPane.ERROR_MESSAGE);
                     }
                 }
@@ -921,7 +934,7 @@ public class JPhotoFrame extends JFrame
             }
         }
         else
-            JOptionPane.showMessageDialog(this, "Select a photo to view!",
+            dialogService.showMessageDialog(this, "Select a photo to view!",
                                           APP_NAME, JOptionPane.ERROR_MESSAGE);
     }
     
